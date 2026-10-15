@@ -1,14 +1,18 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
 import { useAppStore } from '@/lib/store';
 
-export default function ListingDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function ListingDetailPage({ params }: { params?: Promise<{ id: string }> }) {
   const router = useRouter();
-  const { id } = use(params);
+  const routeParams = useParams();
+  const unwrappedParams = params ? use(params) : null;
+  const id = (routeParams?.id as string) || unwrappedParams?.id || '';
   const { listings, claimListing } = useAppStore();
 
   const [quantity, setQuantity] = useState(1);
@@ -22,8 +26,25 @@ export default function ListingDetailPage({ params }: { params: Promise<{ id: st
     setCurrentTime(Date.now());
   }, []);
 
-  // Find item by ID or default to the first one
-  const item = listings.find((l) => l.id === id) || listings[0];
+  // Safe fallback item to guarantee crash-free rendering during any SSR/hydration cycle
+  const fallbackItem = {
+    id: id || 'demo-1',
+    donorName: 'Community Kitchen',
+    title: 'Surplus Rescue Package',
+    description: 'Wholesome prepared surplus ready for pickup.',
+    category: 'cooked_meal' as const,
+    quantityServings: 10,
+    dietaryTags: ['Vegetarian'],
+    photoUrls: ['https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80'],
+    pickupAddress: '100 Community Ave, Downtown Metro',
+    pickupInstructions: 'Front reception counter',
+    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 4).toISOString(),
+    distanceKm: 0.8,
+    status: 'available' as const,
+  };
+
+  // Find item by ID or default to the first one or fallback
+  const item = listings.find((l) => l.id === id) || listings[0] || fallbackItem;
 
   const nowMs = currentTime || 1760500000000;
   const hoursLeft = Math.max(1, Math.round((new Date(item.expiresAt).getTime() - nowMs) / (1000 * 60 * 60)));
