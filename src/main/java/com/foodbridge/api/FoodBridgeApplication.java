@@ -18,15 +18,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 
+/**
+ * Main Spring Boot Application entrypoint for Food Bridge API.
+ * Configures database seeding, Spring component scanning, and application lifecycle.
+ */
 @SpringBootApplication
-public class FoodBridgeApiApplication {
+public class FoodBridgeApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(FoodBridgeApiApplication.class, args);
+        SpringApplication.run(FoodBridgeApplication.class, args);
     }
 
     /**
-     * Seed initial demo users and listings for immediate out-of-the-box local testing.
+     * Seeds initial verified donors, recipients, surplus listings, and emergency alerts
+     * for immediate local evaluation and demonstration.
      */
     @Bean
     public CommandLineRunner seedDemoData(
@@ -39,7 +44,7 @@ public class FoodBridgeApiApplication {
                 return;
             }
 
-            // 1. Seed Donor
+            // 1. Seed Food Business Donor
             User donor = User.builder()
                     .email("donor@saffrongrand.com")
                     .fullName("Saffron Grand Restaurant")
@@ -56,7 +61,7 @@ public class FoodBridgeApiApplication {
                     .build();
             userRepository.save(donor);
 
-            // 2. Seed Recipient (NGO)
+            // 2. Seed Recipient NGO Shelter
             User recipient = User.builder()
                     .email("shelter@communityaid.org")
                     .fullName("Hope Harbor Community Shelter")
@@ -73,7 +78,7 @@ public class FoodBridgeApiApplication {
                     .build();
             userRepository.save(recipient);
 
-            // 3. Seed Volunteer
+            // 3. Seed Volunteer Courier
             User volunteer = User.builder()
                     .email("volunteer@foodbridge.org")
                     .fullName("Marcus Chen (Volunteer Courier #42)")
@@ -123,7 +128,7 @@ public class FoodBridgeApiApplication {
                     .build();
             foodListingRepository.save(listing2);
 
-            // 5. Seed Emergency Mode Alert
+            // 5. Seed Emergency Mode Alert (< 3 hours expiry window)
             EmergencyAlert alert = EmergencyAlert.builder()
                     .title("CRITICAL RESCUE: 45 Servings Hot Meals Expiring in 3 Hours")
                     .message("Immediate transport requested for cooked meals from Saffron Grand to any neighborhood community kitchen.")
