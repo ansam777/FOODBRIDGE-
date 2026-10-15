@@ -154,91 +154,108 @@ The platform enables donors to list surplus food in seconds, lets recipients dis
 ### 3.1 High-Level Architecture Diagram
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        CLIENT LAYER                                 │
-│  ┌───────────────────────┐    ┌──────────────────────────────────┐  │
-│  │   Next.js App (SSR)   │    │   PWA / Mobile (Responsive)      │  │
-│  │   TypeScript           │    │   Installable on Home Screen     │  │
-│  │   Tailwind CSS         │    │   Push via Web Push API          │  │
-│  │   React 18+ (RSC)      │    │                                  │  │
-│  └──────────┬────────────┘    └──────────┬───────────────────────┘  │
-│             │                            │                          │
-│             ▼                            ▼                          │
-│  ┌──────────────────────────────────────────────────────────────┐   │
-│  │              Next.js Server Actions / API Routes             │   │
-│  │              (Data Mutations, Validation, Auth Checks)       │   │
-│  └──────────────────────────┬───────────────────────────────────┘   │
-└─────────────────────────────┼───────────────────────────────────────┘
-                              │ HTTPS / WSS
-                              ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                       SUPABASE PLATFORM                             │
-│  ┌────────────────┐  ┌──────────────┐  ┌────────────────────────┐  │
-│  │ Supabase Auth   │  │ Realtime     │  │ Supabase Storage       │  │
-│  │ (Email, OAuth,  │  │ (WebSocket   │  │ (Food Photos,          │  │
-│  │  Magic Link)    │  │  Subscriptions│  │  Profile Avatars)      │  │
-│  └────────┬───────┘  └──────┬───────┘  └──────────┬─────────────┘  │
-│           │                 │                      │                │
-│           ▼                 ▼                      ▼                │
-│  ┌──────────────────────────────────────────────────────────────┐   │
-│  │                   PostgreSQL Database                        │   │
-│  │         Row-Level Security (RLS) Policies                   │   │
-│  │         PostGIS Extension (Geospatial Queries)              │   │
-│  └──────────────────────────────────────────────────────────────┘   │
-│                                                                     │
-│  ┌──────────────────────────────────────────────────────────────┐   │
-│  │              Supabase Edge Functions (Deno)                  │   │
-│  │  • OTP Generation & Validation                              │   │
-│  │  • Push Notification Dispatch                               │   │
-│  │  • Listing Expiry Cron (pg_cron)                            │   │
-│  │  • Analytics Aggregation                                    │   │
-│  └──────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                    EXTERNAL SERVICES                                │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────┐  │
-│  │ Mapbox /      │  │ Firebase     │  │ Resend / SendGrid       │  │
-│  │ Google Maps   │  │ Cloud        │  │ (Transactional Email)   │  │
-│  │ (Geocoding,   │  │ Messaging    │  │                          │  │
-│  │  Map Tiles)   │  │ (Push Notifs)│  │                          │  │
-│  └──────────────┘  └──────────────┘  └──────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              CLIENT / CONSUMER LAYER                            │
+│  ┌───────────────────────────┐    ┌──────────────────────────────────────────┐  │
+│  │   Mobile / Web Frontend   │    │   Emergency Broadcast SMS / Push PWA     │  │
+│  │   (React / Android / iOS) │    │   (FCM, Web Push, Twilio SMS)            │  │
+│  └─────────────┬─────────────┘    └────────────────────┬─────────────────────┘  │
+└────────────────┼───────────────────────────────────────┼────────────────────────┘
+                 │ REST / JSON (HTTPS)                   │
+                 ▼                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                    JAVA SPRING BOOT 3.x ENTERPRISE BACKEND                      │
+│                                                                                 │
+│  ┌───────────────────────────────────────────────────────────────────────────┐  │
+│  │             Spring Security Layer (JWT Filters, RBAC, OAuth2)             │  │
+│  └─────────────────────────────────────┬─────────────────────────────────────┘  │
+│                                        │                                        │
+│  ┌─────────────────────────────────────▼─────────────────────────────────────┐  │
+│  │                     REST Controllers (@RestController)                   │  │
+│  │     AuthController • FoodListingController • ClaimController              │  │
+│  │     VolunteerController • EmergencyAlertController • ImpactController     │  │
+│  └─────────────────────────────────────┬─────────────────────────────────────┘  │
+│                                        │                                        │
+│  ┌─────────────────────────────────────▼─────────────────────────────────────┐  │
+│  │                     Service & Business Logic Layer                        │  │
+│  │  • 6-Step Smart Proximity Matching Engine                                 │  │
+│  │  • Emergency Broadcast & Surplus Expiry Dispatcher                        │  │
+│  │  • OTP / QR Cryptographic Handover Validation                            │  │
+│  │  • Audit Logging & CO2 Impact Calculation Engine                         │  │
+│  └─────────────────────────────────────┬─────────────────────────────────────┘  │
+│                                        │                                        │
+│  ┌─────────────────────────────────────▼─────────────────────────────────────┐  │
+│  │               Spring Data JPA & Hibernate ORM Repository Layer            │  │
+│  │   UserRepository • FoodListingRepository • MatchClaimRepository           │  │
+│  │   EmergencyAlertRepository • AuditLogRepository                           │  │
+│  └─────────────────────────────────────┬─────────────────────────────────────┘  │
+└────────────────────────────────────────┼────────────────────────────────────────┘
+                                         │ JDBC / Connection Pool (HikariCP)
+                                         ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                         PERSISTENCE & DATA STORAGE                              │
+│  ┌───────────────────────────────────────────────────────────────────────────┐  │
+│  │              Relational Database: MySQL 8.0+ / PostgreSQL 15+             │  │
+│  │  • Spatial indexing (Point / ST_Distance_Sphere / PostGIS)                │  │
+│  │  • ACID transaction boundaries for concurrent food claiming               │  │
+│  │  • Foreign keys, optimistic locking (@Version), and audit triggers        │  │
+│  └───────────────────────────────────────────────────────────────────────────┘  │
+│  ┌────────────────────────────────┐    ┌─────────────────────────────────────┐  │
+│  │  Redis Cache (Optional / P2)   │    │   S3-Compatible Object Storage      │  │
+│  │  (Session tokens & Geo-index)  │    │   (Food photos & receipts)          │  │
+│  └────────────────────────────────┘    └─────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### 3.2 Tech Stack Detail
 
-| Layer | Technology | Rationale |
-|-------|-----------|-----------|
-| **Frontend Framework** | Next.js 14+ (App Router, React Server Components) | SSR for SEO; RSC for reduced client JS; Server Actions for mutations |
-| **Language** | TypeScript (strict mode) | Type safety across full stack; shared types for DB schema |
-| **Styling** | Tailwind CSS 3.4+ | Utility-first; rapid prototyping; small bundle with purging |
-| **UI Components** | shadcn/ui + Radix Primitives | Accessible, composable, unstyled primitives |
-| **Maps** | Mapbox GL JS / Leaflet + OpenStreetMap | Interactive map feed; geocoding; directions |
-| **Backend / BaaS** | Supabase (self-hosted or cloud) | PostgreSQL, Auth, Realtime, Storage, Edge Functions in one platform |
-| **Database** | PostgreSQL 15+ with PostGIS | Geospatial indexing (`ST_DWithin`), JSONB, full-text search |
-| **Auth** | Supabase Auth (GoTrue) | Email/password, Google OAuth, Magic Link; JWT-based sessions |
-| **Realtime** | Supabase Realtime (WebSocket) | Live listing status updates, delivery tracking |
-| **File Storage** | Supabase Storage (S3-compatible) | Food photos with auto-resize via image transformations |
-| **Serverless Functions** | Supabase Edge Functions (Deno) | OTP logic, cron jobs, webhook handlers |
-| **State Management** | React Server Components + `nuqs` (URL state) + Zustand (minimal client state) | Minimal client state; URL-driven filters |
-| **API Layer** | Next.js Server Actions + Supabase JS Client (`@supabase/ssr`) | Co-located data fetching; RLS-enforced queries |
-| **Push Notifications** | Web Push API + Firebase Cloud Messaging (mobile) | Cross-platform push |
-| **Email** | Resend or SendGrid | Transactional emails: verification, claim alerts |
-| **CI/CD** | GitHub Actions → Vercel (frontend) + Supabase CLI (migrations) | Automated deployments, migration safety |
-| **Monitoring** | Sentry (errors), Vercel Analytics (web vitals), Supabase Dashboard | Production observability |
+| Layer | Technology | Version | Rationale |
+|-------|------------|---------|-----------|
+| **Core Platform** | Java JDK | 17+ / 21 LTS | High-performance modern Java, pattern matching, records, virtual threads |
+| **Backend Framework** | Spring Boot | 3.3.x | Industry standard enterprise framework, robust ecosystem, production-grade metrics |
+| **Web / REST Layer** | Spring Web (Spring MVC) | 6.1.x | Robust RESTful APIs with JSR-380 Bean Validation (`@Valid`) |
+| **Persistence / ORM** | Spring Data JPA + Hibernate | 6.x | Standardized entity mapping, repository abstraction, derived queries |
+| **Security & Auth** | Spring Security 6.x + JJWT | 6.x | Stateless JWT authentication, role-based access control (RBAC), password hashing (BCrypt) |
+| **Database** | MySQL 8.0+ (or PostgreSQL 15+) | 8.0+ | Enterprise ACID compliance, robust spatial extensions, reliable relational integrity |
+| **Build Tool** | Apache Maven / Maven Wrapper | 3.9+ | Standardized dependency management and reproducible multi-platform builds |
+| **Boilerplate Reduction** | Project Lombok | 1.18+ | Clean code with `@Getter`, `@Setter`, `@Builder`, `@NoArgsConstructor` |
+| **Documentation** | SpringDoc OpenAPI (Swagger 3) | 2.5+ | Auto-generated interactive API docs for frontend / mobile integration |
+| **Testing** | JUnit 5 + Mockito + Testcontainers | Latest | Unit, slice, and integrated container testing |
 
-### 3.3 Key Architectural Decisions
+### 3.3 The 6-Step Smart Matching Flow & Core Domain Architecture
 
-| # | Decision | Context & Consequence |
-|---|----------|----------------------|
-| ADR-1 | **Server Actions over REST API routes** | Reduces boilerplate; co-locates mutation logic with UI; type-safe end-to-end. Trade-off: tighter coupling to Next.js. |
-| ADR-2 | **PostGIS for geospatial queries** | Enables radius-based discovery (`ST_DWithin`) with spatial indexing (GiST). Avoids client-side distance filtering. |
-| ADR-3 | **Supabase RLS as primary authorization layer** | Security at the database level; every query (even from Edge Functions) is governed by policies. Reduces surface area for auth bugs. |
-| ADR-4 | **PWA over native mobile app (Phase 1)** | Faster time-to-market; single codebase; installable on Android/iOS. Native app deferred to Phase 3. |
-| ADR-5 | **OTP + QR dual-mode verification** | OTP for low-tech users (SMS/in-app code); QR for speed. Both generate a single `handover_token`. |
-| ADR-6 | **Soft deletes across all entities** | Compliance, audit trail, and analytics. `deleted_at` timestamp; RLS policies filter soft-deleted rows. |
+The core operational engine of Food Bridge executes the following deterministic 6-step lifecycle:
+
+```
+[ Step 1: Donor Post ] ──> [ Step 2: Proximity Match ] ──> [ Step 3: Emergency Broadcast ]
+                                                                      │
+[ Step 6: Verified Handover ] <── [ Step 5: Volunteer Courier ] <── [ Step 4: Claim Lock ]
+```
+
+1. **Step 1 — Food Surplus Listing Submission:**
+   - Donors submit food batches (title, category, quantity of servings, prepared time, expiry window, pickup instructions, coordinates).
+   - Validation ensures listings have at least a 30-minute validity buffer before expiration.
+
+2. **Step 2 — Proximity & Preference Matching:**
+   - Spatial indexing calculates spherical distance (`ST_Distance_Sphere` or Haversine formula).
+   - Matches candidate recipients (shelters, NGOs, individual beneficiaries) within configured radius (default 5.0 km).
+
+3. **Step 3 — Emergency Mode Triggering:**
+   - When shelf life is under 2 hours, or an NGO flags a critical shortage, the system triggers an `EmergencyAlert`.
+   - Highest-priority push alerts and SMS broadcast notify nearby rescue partners immediately.
+
+4. **Step 4 — Concurrency-Safe Claim Reservation:**
+   - When a recipient claims a listing, database transactions enforce a strict single-active-claim rule (`@Version` optimistic locking).
+   - Generates a cryptographically random, single-use 6-digit OTP and UUID-based QR code pass.
+
+5. **Step 5 — Volunteer Courier Dispatch (Optional Logistics):**
+   - If recipient selects `needsDelivery = true`, available volunteers in radius receive courier pickup requests with route calculations.
+
+6. **Step 6 — Handover Verification & Ledger Recording:**
+   - Upon physical meeting at donor kitchen, claimant or volunteer provides the 6-digit OTP.
+   - Spring Boot validation service verifies OTP, updates status to `COMPLETED`, records impact ledger (meals rescued, CO₂ averted), and sends confirmation.
+
+---
 
 ---
 
