@@ -87,44 +87,208 @@ export default function Home() {
       <main className="w-full pt-20">
         
         {/* Hero Section */}
-        <section className="relative w-full overflow-hidden bg-gradient-to-b from-primary-fixed/20 via-surface to-surface pb-12 sm:pb-16">
-          <div className="absolute -top-24 right-1/4 w-[500px] h-[500px] rounded-full bg-primary-container/5 blur-3xl pointer-events-none" />
+        <section className="relative w-full overflow-hidden bg-gradient-to-b from-primary-fixed/25 via-surface to-surface pb-12 sm:pb-16 border-b border-outline-variant/20">
+          <div className="absolute -top-24 right-1/4 w-[500px] h-[500px] rounded-full bg-primary-container/10 blur-3xl pointer-events-none" />
           <div className="absolute top-1/3 -left-20 w-[420px] h-[420px] rounded-full bg-secondary-container/20 blur-3xl pointer-events-none" />
+          <div className="absolute bottom-10 right-10 w-[300px] h-[300px] rounded-full bg-tertiary-fixed/30 blur-3xl pointer-events-none" />
 
-          <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12">
+          <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10">
             
-            {/* Eyebrow Tag */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container-lowest shadow-sm mb-6 border border-outline-variant/20">
-              <span className="inline-block w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-xs text-primary font-bold uppercase tracking-wider">
-                Hyperlocal Mutual Aid Network
-              </span>
-              <span className="text-outline-variant">•</span>
-              <span className="text-xs text-on-surface-variant font-medium">
-                Live in Downtown Metro
-              </span>
+            {/* Top Eyebrow Badges */}
+            <div className="flex flex-wrap items-center gap-2 mb-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container-lowest shadow-sm border border-outline-variant/30 text-xs font-semibold text-on-surface">
+                <span className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
+                <span className="text-primary font-bold uppercase tracking-wider text-[11px]">
+                  Hyperlocal Mutual Aid Network
+                </span>
+                <span className="text-outline-variant">•</span>
+                <span className="text-on-surface-variant font-medium">Downtown Metro</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary-container/40 text-on-secondary-container text-xs font-semibold border border-secondary/20">
+                <span className="material-symbols-outlined text-[16px] text-secondary">bolt</span>
+                <span>{listings.filter((l) => l.status === 'available').length} Rescues Available Right Now</span>
+              </div>
             </div>
 
-            {/* Headline */}
-            <div className="max-w-4xl">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-on-surface tracking-tight leading-[1.1] mb-5">
-                Rescue Good Food, <br />
-                <span className="text-primary-container">Feed Your Community.</span>
-              </h1>
-              <p className="text-base sm:text-lg text-on-surface-variant max-w-2xl leading-relaxed">
-                Connect directly with neighborhood bakeries, artisan grocers, and commercial kitchens to redistribute wholesome surplus meals before closing time. 100% free community mutual aid and rescue bags.
-              </p>
+            {/* Hero Main Grid: Left Copy & CTAs, Right Interactive Radar Spotlight */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-10">
+              
+              {/* Left Column: Headlines & Call to Actions (7 cols) */}
+              <div className="lg:col-span-7 flex flex-col justify-center">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-on-surface tracking-tight leading-[1.08] mb-5">
+                  Rescue Good Food, <br />
+                  <span className="text-primary-container bg-gradient-to-r from-primary to-primary-container bg-clip-text text-transparent">
+                    Feed Your Community.
+                  </span>
+                </h1>
+                
+                <p className="text-base sm:text-lg text-on-surface-variant max-w-xl leading-relaxed mb-6 font-normal">
+                  Connect neighborhood bakeries, artisan grocers, and commercial kitchens directly with shelters, families, and community kitchens. Zero waste, zero stigma, and verified in minutes with single-use OTP handovers.
+                </p>
+
+                {/* Primary Hero CTAs */}
+                <div className="flex flex-wrap items-center gap-3 mb-8">
+                  <Link
+                    href="/feed"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-primary-container text-on-primary font-bold text-sm shadow-lg shadow-primary-container/25 hover:bg-primary hover:shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">explore</span>
+                    <span>Browse Nearby Surplus</span>
+                  </Link>
+                  <Link
+                    href="/donate"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-surface-container-lowest text-primary font-bold text-sm shadow-md hover:bg-surface-bright border border-outline-variant/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">add_circle</span>
+                    <span>Post Surplus Batch</span>
+                  </Link>
+                  <Link
+                    href="/volunteer"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3.5 rounded-full bg-surface-container-low text-on-surface-variant hover:text-on-surface font-semibold text-xs hover:bg-surface-container transition-all"
+                  >
+                    <span className="material-symbols-outlined text-[18px] text-secondary">pedal_bike</span>
+                    <span>Volunteer Courier</span>
+                  </Link>
+                </div>
+
+                {/* Trust & Safety Badges */}
+                <div className="grid grid-cols-3 gap-3 pt-6 border-t border-outline-variant/20 max-w-lg">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-secondary text-[20px] shrink-0">verified_user</span>
+                    <div>
+                      <div className="text-xs font-bold text-on-surface">100% Legal Shield</div>
+                      <div className="text-[10px] text-on-surface-variant">Good Samaritan Act</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-[20px] shrink-0">schedule</span>
+                    <div>
+                      <div className="text-xs font-bold text-on-surface">60s Fast Dispatch</div>
+                      <div className="text-[10px] text-on-surface-variant">Realtime claims</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-tertiary text-[20px] shrink-0">pin</span>
+                    <div>
+                      <div className="text-xs font-bold text-on-surface">Secure OTP</div>
+                      <div className="text-[10px] text-on-surface-variant">Handover token</div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Right Column: Live Community Surplus Radar & Featured Spotlight Card (5 cols) */}
+              <div className="lg:col-span-5 flex flex-col gap-4">
+                
+                {/* Live Radar Interactive Widget */}
+                <div className="relative rounded-3xl bg-surface-container-lowest p-5 shadow-xl border border-outline-variant/30 overflow-hidden">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full bg-secondary animate-ping" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-on-surface">
+                        Live Surplus Radar
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-semibold text-secondary bg-secondary-container/50 px-2.5 py-0.5 rounded-full">
+                      Downtown Metro (3.0 mi)
+                    </span>
+                  </div>
+
+                  {/* Visual Radar Mockup */}
+                  <div className="relative w-full aspect-[16/9] rounded-2xl bg-surface-container-low overflow-hidden flex items-center justify-center border border-outline-variant/20">
+                    {/* Concentric distance rings */}
+                    <div className="absolute w-64 h-64 rounded-full border border-outline-variant/30 pointer-events-none" />
+                    <div className="absolute w-44 h-44 rounded-full border border-dashed border-outline-variant/40 pointer-events-none" />
+                    <div className="absolute w-24 h-24 rounded-full border border-outline-variant/50 pointer-events-none" />
+                    
+                    {/* Center User Location Pin */}
+                    <div className="relative z-10 w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg border-2 border-surface">
+                      <span className="material-symbols-outlined text-[18px]">person_pin_circle</span>
+                    </div>
+
+                    {/* Surrounding Active Listing Dots */}
+                    <Link
+                      href="/feed"
+                      className="absolute top-6 left-10 z-10 flex items-center gap-1 bg-surface-container-lowest/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md border border-outline-variant/30 hover:scale-105 transition-transform"
+                      title="Fresh Sourdough - 0.4 mi"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-secondary" />
+                      <span className="text-[10px] font-bold text-on-surface">Bakery • 0.4 mi</span>
+                    </Link>
+
+                    <Link
+                      href="/feed"
+                      className="absolute bottom-8 left-14 z-10 flex items-center gap-1 bg-surface-container-lowest/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md border border-outline-variant/30 hover:scale-105 transition-transform"
+                      title="Cooked Meals - 0.8 mi"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-primary" />
+                      <span className="text-[10px] font-bold text-on-surface">Cooked • 0.8 mi</span>
+                    </Link>
+
+                    <Link
+                      href="/feed"
+                      className="absolute top-10 right-8 z-10 flex items-center gap-1 bg-surface-container-lowest/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md border border-outline-variant/30 hover:scale-105 transition-transform"
+                      title="Fresh Produce - 1.2 mi"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-tertiary" />
+                      <span className="text-[10px] font-bold text-on-surface">Produce • 1.2 mi</span>
+                    </Link>
+                  </div>
+
+                  {/* Spotlight Rescue Banner */}
+                  {listings.length > 0 && (
+                    <div className="mt-4 pt-3 border-t border-outline-variant/20 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={listings[0].photoUrls[0]}
+                          alt={listings[0].title}
+                          className="w-12 h-12 rounded-xl object-cover shrink-0 border border-outline-variant/20"
+                        />
+                        <div className="min-w-0">
+                          <div className="text-[11px] font-bold text-primary flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[14px]">timer</span>
+                            <span>Expires Soon ({listings[0].quantityServings} portions)</span>
+                          </div>
+                          <div className="text-xs font-bold text-on-surface truncate">
+                            {listings[0].title}
+                          </div>
+                          <div className="text-[10px] text-on-surface-variant truncate">
+                            {listings[0].donorName} • {listings[0].distanceKm} mi away
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {listings[0].status === 'available' ? (
+                        <button
+                          onClick={() => handleQuickReserve(listings[0].id, listings[0].title, listings[0].donorName)}
+                          className="shrink-0 px-3 py-1.5 rounded-full bg-primary-container text-on-primary text-[11px] font-bold hover:bg-primary transition-colors shadow-sm"
+                        >
+                          Quick Reserve
+                        </button>
+                      ) : (
+                        <span className="shrink-0 text-[10px] font-bold px-2 py-1 rounded bg-surface-container text-on-surface-variant">
+                          Claimed
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
             </div>
 
             {/* Dual Primary Action Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
               
               {/* Donate Surplus Food Card */}
-              <div className="relative overflow-hidden rounded-2xl bg-primary-container p-6 sm:p-8 text-on-primary shadow-xl hover:shadow-2xl transition-all duration-300 group flex flex-col justify-between">
+              <div className="relative overflow-hidden rounded-3xl bg-primary-container p-6 sm:p-8 text-on-primary shadow-xl hover:shadow-2xl transition-all duration-300 group flex flex-col justify-between">
                 <div className="absolute top-0 right-0 -mr-12 -mt-12 w-48 h-48 rounded-full bg-on-primary/10 blur-2xl group-hover:scale-125 transition-transform duration-500" />
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-on-primary/15 flex items-center justify-center text-on-primary">
+                    <div className="w-12 h-12 rounded-2xl bg-on-primary/15 flex items-center justify-center text-on-primary">
                       <span className="material-symbols-outlined text-[28px]">storefront</span>
                     </div>
                     <span className="px-3 py-1 rounded-full bg-on-primary/20 text-xs tracking-wide uppercase font-bold text-on-primary">
@@ -138,7 +302,7 @@ export default function Home() {
                     List any surplus batch in under 60 seconds. Full legal shield under the Bill Emerson Good Samaritan Act with immediate tax receipts and dispatch pickup.
                   </p>
                 </div>
-                <div className="flex items-center justify-between pt-4 bg-on-primary/10 -mx-6 sm:-mx-8 -mb-6 sm:-mb-8 p-6 sm:p-8 rounded-b-2xl">
+                <div className="flex items-center justify-between pt-4 bg-on-primary/10 -mx-6 sm:-mx-8 -mb-6 sm:-mb-8 p-6 sm:p-8 rounded-b-3xl">
                   <div className="flex items-center gap-1.5 text-on-primary text-xs font-semibold">
                     <span className="material-symbols-outlined text-[18px]">verified</span>
                     <span>100% Liability Protected</span>
@@ -154,11 +318,11 @@ export default function Home() {
               </div>
 
               {/* Find & Request Food Card */}
-              <div className="relative overflow-hidden rounded-2xl bg-surface-container-lowest p-6 sm:p-8 text-on-surface shadow-md hover:shadow-xl transition-all duration-300 group flex flex-col justify-between border border-outline-variant/30">
+              <div className="relative overflow-hidden rounded-3xl bg-surface-container-lowest p-6 sm:p-8 text-on-surface shadow-md hover:shadow-xl transition-all duration-300 group flex flex-col justify-between border border-outline-variant/30">
                 <div className="absolute top-0 right-0 -mr-12 -mt-12 w-48 h-48 rounded-full bg-primary-fixed/40 blur-2xl group-hover:scale-125 transition-transform duration-500" />
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center text-primary">
+                    <div className="w-12 h-12 rounded-2xl bg-surface-container-low flex items-center justify-center text-primary">
                       <span className="material-symbols-outlined text-[28px]">lunch_dining</span>
                     </div>
                     <span className="px-3 py-1 rounded-full bg-secondary-container/60 text-xs tracking-wide uppercase font-bold text-on-secondary-container">
@@ -172,7 +336,7 @@ export default function Home() {
                     Explore restaurant meals, fresh sourdough bread bags, and crisp produce bundles within walking distance. Ranging from $0.00 free mutual aid to pantry recovery rates.
                   </p>
                 </div>
-                <div className="flex items-center justify-between pt-4 bg-surface-container-low/70 -mx-6 sm:-mx-8 -mb-6 sm:-mb-8 p-6 sm:p-8 rounded-b-2xl">
+                <div className="flex items-center justify-between pt-4 bg-surface-container-low/70 -mx-6 sm:-mx-8 -mb-6 sm:-mb-8 p-6 sm:p-8 rounded-b-3xl">
                   <div className="flex items-center gap-1.5 text-on-surface-variant text-xs font-semibold">
                     <span className="material-symbols-outlined text-secondary text-[18px]">check_circle</span>
                     <span>No Income Verification Needed</span>
@@ -190,7 +354,7 @@ export default function Home() {
             </div>
 
             {/* Quick Inline Search & Interactive Filter Bar */}
-            <div className="mt-8 p-4 rounded-2xl bg-surface-container-lowest shadow-lg border border-outline-variant/20">
+            <div className="mt-8 p-4 rounded-3xl bg-surface-container-lowest shadow-lg border border-outline-variant/20">
               <div className="flex flex-col lg:flex-row items-center gap-4">
                 
                 {/* Search input */}
