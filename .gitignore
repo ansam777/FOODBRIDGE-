@@ -46,6 +46,14 @@ bin/
 application-local.properties
 application-local.yml
 
+# Next.js / Node
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
 # OS Files
 .DS_Store
 Thumbs.db
