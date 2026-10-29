@@ -19,7 +19,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class FoodListingCreateRequest {
 
-    @NotNull(message = "Donor ID is required")
     private UUID donorId;
 
     @NotBlank(message = "Title is required")

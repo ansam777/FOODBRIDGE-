@@ -38,7 +38,7 @@ export default function DonatePortalPage() {
     }
   };
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!title.trim()) return;
 
     addListing({
@@ -58,6 +58,46 @@ export default function DonatePortalPage() {
       donorType: 'Restaurant',
       isDeliveryAvailable: allowVolunteer,
     });
+
+    try {
+      const categoryMap: Record<string, string> = {
+        cooked_meal: 'COOKED_MEAL',
+        raw_ingredients: 'RAW_INGREDIENTS',
+        bakery: 'BAKERY',
+        packaged: 'PACKAGED',
+        beverages: 'BEVERAGES',
+        other: 'OTHER',
+      };
+
+      const now = new Date();
+      const expiry = new Date(Date.now() + 4 * 60 * 60 * 1000);
+
+      const payload = {
+        title: title.trim(),
+        description: description.trim(),
+        category: categoryMap[category] || 'COOKED_MEAL',
+        quantityServings: Number(servings) || 10,
+        dietaryTags: dietaryTags.join(','),
+        photoUrl: selectedPhoto,
+        pickupAddress: address.trim() || '42 Brigade Road, Central District',
+        pickupInstructions: instructions.trim() || 'Standard pickup',
+        latitude: 12.9716,
+        longitude: 77.5946,
+        preparedAt: now.toISOString().slice(0, 19),
+        expiresAt: expiry.toISOString().slice(0, 19),
+        isDeliveryAvailable: Boolean(allowVolunteer),
+      };
+
+      await fetch('http://localhost:8080/api/v1/listings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      console.warn('Backend sync note:', err);
+    }
 
     setPublished(true);
     setTimeout(() => {
